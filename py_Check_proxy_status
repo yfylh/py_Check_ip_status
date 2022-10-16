@@ -1,0 +1,58 @@
+import random
+import requests
+
+ua_list = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36",
+    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.75 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.119 Safari/537.36",
+    "Mozilla / 5.0(Windows NT 6.1;WOW64) AppleWebKit / 537.36(KHTML, likeGecko) Chrome / 45.0.2454.101Safari / 537.36"
+    ]
+def _load_text_file(txt_file):
+    """
+        加载text文件
+        :param txt_file:
+        :return:
+        """
+    text_content = []
+    with open(txt_file, 'r', encoding='utf-8-sig') as text_file:
+        while True:
+            content = text_file.readline()
+            if not content:
+                break
+                line = content.strip('\n')
+                text_content.append(line)
+                FileUtils._check_format(txt_file, text_content)
+                return text_content
+# 随机取出一个Ip
+def get_random_ip(path):
+    black_ = []
+    client = _load_text_file(path)
+    print(client)
+    url_for_test = 'https://baidu.com/'
+    user_agent = random.choice(ua_list)
+    headers = {
+        'Accept': 'text/html, application/xhtml+xml, application/xml;',
+        'Accept-Encoding': 'gzip, deflate, sdch',
+        'Accept-Language': 'zh-CN,zh;q=0.8',
+        'Referer': 'https://baidu.com/',
+        'User-Agent': user_agent
+    }
+    for useful_proxy in client:
+
+        proxy = {
+            'http': 'http://' + useful_proxy,
+            #'https': 'http://' + useful_proxy
+        }
+
+        response = requests.get(url_for_test,headers=headers,proxies=proxy,timeout=10)
+        if response.status_code == 200:
+            return useful_proxy
+
+        else:
+            print('此ip - {0} 已失效！！！'.format(useful_proxy))
+            black_.append(useful_proxy)
+            get_random_ip(path)
+
+if __name__ == '__main__':
+    path = r'ip.txt'
+    print(get_random_ip(path))
